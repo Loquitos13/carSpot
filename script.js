@@ -1,3 +1,67 @@
+// Atualização do código JavaScript para incluir um menu lateral responsivo em dispositivos móveis
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Inicializar o carrossel e ajustar a responsividade
+  initCarousel();
+  checkResponsiveness();
+
+  // Inicializar o menu lateral mobile
+  initMobileMenu();
+
+  // Adicionar listener para redimensionamento de janela
+  window.addEventListener('resize', checkResponsiveness);
+});
+
+// Função para inicializar o menu lateral mobile
+function initMobileMenu() {
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navbarCollapse = document.getElementById('navbarCollapse');
+  const body = document.body;
+
+  if (navbarToggler && navbarCollapse) {
+    // Adicionar classe 'open' ao body quando o menu está aberto
+    function toggleMenu() {
+      body.classList.toggle('menu-open');
+      navbarCollapse.classList.toggle('show');
+    }
+
+    // Abrir/fechar o menu ao clicar no botão hamburguer
+    navbarToggler.addEventListener('click', function (e) {
+      e.stopPropagation(); // Evitar propagação do evento
+      toggleMenu();
+    });
+
+    // Fechar o menu quando um item de navegação é clicado
+    const navLinks = document.querySelectorAll('#navbarCollapse .nav-link');
+    navLinks.forEach(function (link) {
+      link.addEventListener('click', function () {
+        if (body.classList.contains('menu-open')) {
+          toggleMenu();
+        }
+      });
+    });
+
+    // Fechar o menu quando clicar fora dele
+    document.addEventListener('click', function (event) {
+      if (
+        !navbarCollapse.contains(event.target) &&
+        !navbarToggler.contains(event.target) &&
+        body.classList.contains('menu-open')
+      ) {
+        toggleMenu();
+      }
+    });
+
+    // Fechar o menu automaticamente quando a tela for ampliada além do breakpoint mobile
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 992 && body.classList.contains('menu-open')) {
+        toggleMenu();
+      }
+    });
+  }
+}
+
+
 const feedbacks = [
   {
     id: 1,
@@ -7,7 +71,7 @@ const feedbacks = [
     content: "Serviço excepcional! A Car Spot foi muito atenciosa e resolveu o meu problema rapidamente. Recomendo fortemente para todos os que precisam de um trabalho de qualidade.",
     rating: 5,
     date: "12 de Março, 2025",
-    tags: ["Suporte", "Atendimento"]
+    tags: ["Suporte", "Atendimento"],
   },
   {
     id: 2,
@@ -17,7 +81,7 @@ const feedbacks = [
     content: "Utilizei os serviços várias vezes e sempre fiquei satisfeito com os resultados. A Car Spot é muito profissional e eficiente.",
     rating: 5,
     date: "5 de Março, 2025",
-    tags: ["Pontualidade", "Qualidade"]
+    tags: ["Pontualidade", "Qualidade"],
   },
   {
     id: 3,
@@ -27,7 +91,7 @@ const feedbacks = [
     content: "Trabalho impecável!",
     rating: 4,
     date: "28 de Fevereiro, 2025",
-    tags: ["Pesquisa", "Qualidade"]
+    tags: ["Pesquisa", "Qualidade"],
   },
   {
     id: 4,
@@ -37,7 +101,7 @@ const feedbacks = [
     content: "Com certeza voltarei a contratar os serviços.",
     rating: 5,
     date: "15 de Fevereiro, 2025",
-    tags: ["Preço", "Atendimento"]
+    tags: ["Preço", "Atendimento"],
   },
   {
     id: 5,
@@ -47,8 +111,8 @@ const feedbacks = [
     content: "Atendimento personalizado e de alta qualidade. Senti que realmente se importavam com o meu projeto e se esforçaram para entregar o melhor resultado possível.",
     rating: 5,
     date: "7 de Fevereiro, 2025",
-    tags: ["Personalização", "Atendimento"]
-  }
+    tags: ["Personalização", "Atendimento"],
+  },
 ];
 
 // Função para criar estrelas baseadas na avaliação
@@ -71,7 +135,6 @@ function createFeedbackItem(feedback) {
   item.innerHTML = `
     <div class="feedback-item">
       <div class="feedback-header">
-        
         <div class="feedback-author">
           <h3>${feedback.name}</h3>
           <p>${feedback.role}</p>
@@ -95,13 +158,41 @@ function createFeedbackItem(feedback) {
   return item;
 }
 
+// Verificar responsividade
+function checkResponsiveness() {
+  const isMobile = window.innerWidth <= 576;
+  const isTablet = window.innerWidth <= 768 && window.innerWidth > 576;
+
+  // Ajustar altura do carrossel com base no tamanho da tela
+  const carouselContent = document.querySelector('.carousel-content');
+  const dataFeedbacks = document.querySelectorAll('.feedback-date');
+  if (carouselContent) {
+    if (isMobile) {
+      carouselContent.style.minHeight = '350px';
+      dataFeedbacks.forEach(item => {
+        item.style.display = 'none';
+      });
+    } else if (isTablet) {
+      carouselContent.style.minHeight = '320px';
+      dataFeedbacks.forEach(item => {
+        item.style.display = 'none';
+      });
+    } else {
+      carouselContent.style.minHeight = '300px';
+      dataFeedbacks.forEach(item => {
+        item.style.display = 'block';
+      });
+    }
+  }
+}
+
 // Inicializar o carrossel
 function initCarousel() {
   const carouselItems = document.getElementById('carouselItems');
   const indicator = document.getElementById('indicator');
   const prevButton = document.getElementById('prevButton');
   const nextButton = document.getElementById('nextButton');
-  
+
   // Criar indicadores
   feedbacks.forEach((_, index) => {
     const dot = document.createElement('div');
@@ -148,7 +239,7 @@ function updateCarouselState(newIndex) {
 
     // Calcular a posição relativa no carrossel
     let position = (index - currentIndex + totalItems) % totalItems;
-    
+
     // Ajustar para o efeito de carrossel infinito
     if (position > totalItems / 2) position -= totalItems;
     if (position < -totalItems / 2) position += totalItems;
@@ -184,5 +275,44 @@ function goToSlide(index) {
   updateCarouselState(index);
 }
 
-// Inicializar após o carregamento do DOM
-document.addEventListener('DOMContentLoaded', initCarousel);
+document.addEventListener('DOMContentLoaded', function() {
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuMobile = document.getElementById('menu-mobile');
+  
+  menuToggle.addEventListener('click', function() {
+      if (menuMobile.style.display === 'flex') {
+          menuMobile.style.display = 'none';
+          menuToggle.style.color =  '#ff5d00';
+      } else {
+          menuMobile.style.display = 'flex';
+          menuToggle.style.color =  'black';
+      }
+  });
+
+  // Optionally close the menu when clicking a link
+  const links = menuMobile.querySelectorAll('a');
+  links.forEach(link => {
+      link.addEventListener('click', () => {
+          menuMobile.style.display = 'none';
+      });
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const dropdownToggle = document.querySelector('.dropdown-toggle');
+  const dropdownMenu = document.querySelector('.dropdown-menu');
+
+  // Abrir/fechar o dropdown ao clicar no botão
+  dropdownToggle.addEventListener('click', function () {
+    dropdownMenu.classList.toggle('active');
+  });
+
+  // Fechar o dropdown ao clicar fora dele
+  document.addEventListener('click', function (event) {
+    if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+      dropdownMenu.classList.remove('active');
+    }
+  });
+});
+
+
